@@ -1,0 +1,23 @@
+FROM tensorflow/tensorflow:latest-gpu-py3
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt-get install -y python3.6 python3-pip
+RUN ln -fs /usr/bin/python3.6 /usr/bin/python3
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN python3 get-pip.py --force-reinstall
+RUN pip3 install cython pytest numpy pandas scipy jupyter pydicom scikit-image matplotlib
+RUN pip3 install dicom flask keras tensorflow-gpu mpld3
+RUN apt-get update
+Run apt-get -y install git
+RUN apt-get install net-tools
+RUN jupyter notebook --generate-config
+RUN echo "c.NotebookApp.password='sha1:eaaf930eeb05:6b3b086b76e8da42786ecf1b3ea38d70c7cf5816'">>/root/.jupyter/jupyter_notebook_config.py
+
+RUN git clone --branch master https://github.com/HealthplusAI/python3-gdcm.git && cd python3-gdcm && dpkg -i build_1-1_amd64.deb && apt-get install -f
+
+RUN cp /usr/local/lib/gdcm.py /usr/local/lib/python3.6/dist-packages/.
+RUN cp /usr/local/lib/gdcmswig.py /usr/local/lib/python3.6/dist-packages/.
+RUN cp /usr/local/lib/_gdcmswig.so /usr/local/lib/python3.6/dist-packages/.
+RUN cp /usr/local/lib/libgdcm* /usr/local/lib/python3.6/dist-packages/.
+RUN ldconfig
+RUN apt-get install libpython3.6
